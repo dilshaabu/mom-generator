@@ -34,11 +34,11 @@ if not os.environ.get("GROQ_API_KEY"):
     except Exception:
         pass
 
-from asr import ASR
-from translator import Translator
-from topic_segmenter import TopicSegmenter
-from mom_generator import MoMGenerator
-from exporter import export_txt, export_pdf
+# Pipeline modules (asr, translator, topic_segmenter, mom_generator, exporter)
+# are imported lazily further down, inside the code paths that need them.
+# They pull in faster-whisper / librosa / ctranslate2 / nltk, which are heavy —
+# importing them only when actually used keeps the page itself loading fast
+# and avoids straining Streamlit Cloud's free-tier memory limit on startup.
 
 st.set_page_config(page_title="Multilingual MoM Generator", page_icon="📝", layout="centered")
 st.title("📝 Multilingual Meeting Minutes Generator")
@@ -151,6 +151,11 @@ def text_to_segments(text: str) -> list[dict]:
 
 
 def run_pipeline(segments: list[dict]):
+    from translator import Translator
+    from topic_segmenter import TopicSegmenter
+    from mom_generator import MoMGenerator
+    from exporter import export_txt, export_pdf
+
     status = st.empty()
     t0 = time.time()
 
@@ -204,6 +209,7 @@ if generate_clicked:
                     audio_path = tmp.name
                 try:
                     with st.spinner("Transcribing audio..."):
+                        from asr import ASR
                         asr = ASR(model_size=whisper_size)
                         segments = asr.transcribe(audio_path)
                 finally:
