@@ -1,0 +1,38 @@
+# Environment / secrets
+.env
+*.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Model / cache downloads
+*.ckpt
+*.bin
+.cache/
+~/.cache/
+
+# Outputs (generated at runtime, don't commit)
+outputs/
+*.pdf
+*.txt
+!requirements.txt
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

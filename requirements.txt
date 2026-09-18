@@ -1,0 +1,11 @@
+streamlit
+faster-whisper
+groq
+python-dotenv
+librosa
+soundfile
+nltk
+fpdf2
+python-docx
+PyPDF2
+langdetect
