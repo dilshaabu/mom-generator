@@ -68,7 +68,11 @@ transcript_file = None
 whisper_size = "small"
 
 if mode == "Audio recording":
-    audio_file = st.file_uploader("Upload audio", type=["wav", "mp3", "m4a", "ogg", "flac"])
+    audio_source = st.radio("Source", ["Upload a file", "Record live"], horizontal=True)
+    if audio_source == "Upload a file":
+        audio_file = st.file_uploader("Upload audio", type=["wav", "mp3", "m4a", "ogg", "flac"])
+    else:
+        audio_file = st.audio_input("Record your meeting")  # returns a WAV-encoded UploadedFile
     whisper_size = st.selectbox(
         "Whisper model size", ["small", "medium", "large-v3"], index=0,
         help="Larger = more accurate but slower. 'small' keeps a public CPU demo responsive.",
@@ -181,7 +185,7 @@ def run_pipeline(segments: list[dict]):
 # ---------------------------------------------------------------------------
 if generate_clicked:
     if mode == "Audio recording" and not audio_file:
-        st.warning("Please upload an audio file first.")
+        st.warning("Please upload or record some audio first.")
     elif mode == "Transcript file" and not transcript_file:
         st.warning("Please upload a transcript file first.")
     elif not os.environ.get("GROQ_API_KEY"):
@@ -192,7 +196,9 @@ if generate_clicked:
     else:
         try:
             if mode == "Audio recording":
-                suffix = os.path.splitext(audio_file.name)[1]
+                # st.audio_input recordings are always WAV; st.file_uploader
+                # files carry their real extension in .name.
+                suffix = os.path.splitext(getattr(audio_file, "name", "") or "")[1] or ".wav"
                 with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
                     tmp.write(audio_file.read())
                     audio_path = tmp.name
